@@ -15,14 +15,26 @@
     <div>
         <div id="message">Press to Start</div>
         <div id="start">
-            <button id="btnstart" class="btn">Start Game</button>
+            <button id="btnstart" class="button">Start Game</button>
         </div>
     </div>
-    <div id="output">
+    <!-- give a better name to output -->
+    <div id="outputMessage">  
         Dealer: <div id="dealerHolder"></div>
         Player:  <div id="playerHolder"></div>
     </div>
-    <div id="card" class="card"></div>
-
+    <div class="container1">
+        <div class="card" id="dealerCard1">dc1</div>
+        <div class="card" id="dealerCard2">dc2</div>
+    </div>
+    <div class="container2">
+        <div class="card" id="playerCard1">pc1</div>
+        <div class="card" id="playerCard2">pc2</div>
+    </div>
+    <div id="playerButtons">
+        <button id="stand">Stand</button>
+        <button id="double">Double</button>
+        <button id="hit">Hit</button>
+    </div>
     <script src="js/app.js"></script>
 </body>
