@@ -27,21 +27,19 @@ This is a very simple Blackjack game with initial features to follow basic rules
 - CSS
 
 
-
-
 ### Getting Started
 - Learn the rules of Blackjack. 
-- Write some pseudocode, although be as thorough as you can.
+- Write some pseudocode
 - Wireframe first initial version. It will help you with your HTML layout.
-- Create and all necessary directories using terminal and code away.
+- Create and all necessary directories using terminal and code away...
 
+##### Then countless hours later, you can play the game here: 
 https://shynargaliyeva.github.io/project-1/
 
-
-
-
-
 ### Next Steps
+#### Fix:
+  - When Dealer has Blackjack, game ends, deactivate Player buttons.
+  - Add some styling
 ##### New features:
   - Player can make bets using chips with the value of: $1, $5, $25
   - "Double" feature
@@ -49,4 +47,3 @@ https://shynargaliyeva.github.io/project-1/
       If Double is won, then Player gets both bets. If Double lost then Player loses both bets.
   - "Split" feature
 
-### Wish list
