@@ -349,56 +349,104 @@
  
  * {
       font-family: 'Marcellus', serif;
+      /* background-color:	#f5f5f5; */
+      color: #262626;
+ }
+
+ body {
+     background-color: rgba(188, 222, 221, 0.4);
  }
 
  h1 {
+     font-size: 36px;
      text-align: center;
+     text-transform: uppercase;
+     letter-spacing: 0.1em;
+     text-shadow: 2px 2px 7px #111111;
+     margin: 0;
+     padding: 0;
+
  }
 
- #output {
-     font-size: 1.5em;
+ #outputMessage {
+     font-size: 1.2em;
  }
 
  .button {
      background-color: #FF9681;
      border: 1px solid white;
+     padding: 8px 16px;
      color: white;
      text-align: center;
-     text-decoration: none;
+     /* text-decoration: none; */
      display: inline-block;
      font-size: 16px;
      cursor: pointer;
+     
  }
 
- /* #start {
-     display: flex;
- } */
-/* 
-.playerButtons {
-    display:
-    
-} */
-
 #message {
-    height: 70px;
-    font-size: 30px;
+    height: 40px;
+    font-size: 20px;
     text-align: center;
+    margin: 0;
+}
+
+#bet {
+    background-color: rgba(211, 100, 84, 0.4);
+    padding: 7px 24px;
+    border: none;
+    cursor: pointer;
+}
+
+input {
+    padding: 6px 16px;
+    border: 1px solid #262626;
+}
+
+.playerButtons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #stand {
     background-color: #49ABAD;
+    padding: 8px 24px;
+    
 }
 
 #hit {
     background-color: #B4758F;
+    padding: 8px 30px;
+    
 }
 
 #double {
     background-color: #A4D1E5;
+    padding: 8px 18px;
+    
 }
 
 .container {
     display: flex;
     align-items: center;
+    padding: 30px 0 0 0;
+    z-index: 5px;
     justify-content: center;
+}
+
+.placeBet {
+   position: relative;
+   top: 280px;
+ }
+
+ #btnStart {
+     position: relative;
+     top: 280px;
+     margin: 0;
+ }
+
+.dummy {
+    border-style: dashed;
 }

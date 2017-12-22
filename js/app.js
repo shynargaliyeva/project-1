@@ -2,44 +2,56 @@
 var suits = ['s', 'c', 'd', 'h'];
 var numb = ['02', '03', '04', '05', '06', '07', '08', '09', '10', 'J', 'Q', 'K', 'A'];
 var cards;
+var placeholderCards = '<div class="card dummy"></div><div class="card dummy"></div>'
 
 // /*----- app's state (variables) -----*/
 var deck;
 var playerHand;
 var dealerHand; 
 var cardCount; // which card I'm at within the deck
+var winner;
 var balance;
-var playerScore;
-var dealerScore;
-var dealersTurn;
+var bet;
+var stand;
 
 // /*----- cached element references -----*/
 var $message = document.getElementById('message');
 var $dValue = document.querySelector('#dValue');
 var $pValue = document.querySelector('#pValue');
 // var $balEl = document.querySelector('h5 span');
-// var $inputEl = document.querySelector('input');
-var $hitBtn = document.getElementById('hit');
-var $btnStart = document.getElementById('btnstart')
+var $inputEl = document.querySelector('input');
+var $btnStart = document.getElementById('btnStart')
 var $bet = document.getElementById('bet');
+var $balance = document.getElementById('balance');
+var $betAmount = document.getElementById('betAmount');
 var $container2 = document.querySelector('.container2');
 var $container1 = document.querySelector('.container1');
+var $hitBtn = document.getElementById('hit');
 var $standBtn = document.getElementById('stand');
-var $playerButtons = document.querySelector('.playerButtons');
+var $betGroup = document.querySelector('.placeBet');
+
 // /*----- event listeners -----*/
 $btnStart.addEventListener('click', function() {
-        init();
-        render();
+    deal();
+    render();
 });
 
 $bet.addEventListener('click', function() {
-//    var  balance = 100;
-//    balance -=parseFloat(inputEl.value);
+    var amount = parseInt($inputEl.value);
+    if (balance >= amount) {
+        bet += amount;
+        balance -= amount;
+    }
+    render();
 });
 
 $hitBtn.addEventListener('click', function() {
-    console.log('hit function run')
-    hit(cardCount, playerHand);
+    hit(playerHand);
+    if (score(playerHand) > 21) {
+        winner = 'D';
+        bet = 0;
+        doPayout(winner);
+    }
     render();
 });
 
@@ -47,6 +59,23 @@ $standBtn.addEventListener('click', stand);
 
 /*----- functions -----*/
 
+function doPayout(win) {
+    switch (win) {
+        case 'P': 
+            balance += bet * 2;
+            break;
+        case 'D':
+            break;
+        case 'B':  // blackjack
+            balance += (score(dealerHand) === 21) ? 0 : bet + (bet * 1.5);
+            break;
+        default:
+            balance += bet;
+    }
+    bet = 0;
+};
+
+// build a deck of cards
 function buildDeck() {
     cards = [];
     for (suit of suits) {
@@ -64,70 +93,107 @@ function buildDeck() {
             cards.push(card);
         });
     }
-}
+};
+
+// shuffle cards
+function shuffleDeck() {
+    buildDeck();
+    deck = [];
+    while (cards.length) {
+        deck.push(cards.splice(Math.floor(Math.random() * cards.length), 1)[0]);
+    }
+};
 
 // init function
 function init() {
+    balance = 100;
+    winner = null;
+    bet = 0;
+};
+
+function deal() {
     shuffleDeck();
-    dealersTurn = false;
+    winner = null;
     playerHand = [];
     dealerHand = [];
     cardCount = 0;
     dealerHand.push(deck[cardCount], deck[cardCount + 1]);
     playerHand.push(deck[cardCount + 2], deck[cardCount + 3]);
     cardCount += 4
-    playerScore = score(playerHand);
+    stand = false;
     render();
-    $playerButtons.style.display = 'inline-block';
-
 };
-// when something is displayed out it in render. adds to DOM
-function render() {
-    dealersTurn ? displayBoth() : displayOne();
-    $pValue.innerText = playerScore;
-    $dValue.innerText = dealerScore ? score(dealerHand) : '';
-    $message.innerText = winner() ? winner() : 'sup';
-    
-    if (dealersTurn) $playerButtons.style.display = 'none';
 
-}
 // hit function. call when press hit
-function hit() {
-    playerHand.push(deck[cardCount])
-    cardCount+=1
-    playerScore = score(playerHand);
+function hit(hand) {
+    hand.push(deck[cardCount])
+    cardCount += 1;
+}
+
+function render() {
+    $balance.innerHTML = `Balance: \$${balance}`;
+    $betAmount.innerHTML = `Bet Amount: \$${bet}`;
+    $pValue.innerText = score(playerHand);
+    $dValue.innerText = winner ? score(dealerHand) : '';
+    // hide/show controls
+    $btnStart.style.visibility = (winner || !dealerHand) && bet ? 'visible' : 'hidden';
+    $standBtn.style.visibility = $hitBtn.style.visibility = winner ? 'hidden' : 'visible';
+    $betGroup.style.visibility = winner || !dealerHand ? 'visible' : 'hidden';
+    // TODO: hide/show doubleBtn
+    renderHands();
+    renderMessage();
+};
+
+function renderMessage() {
+    switch (winner) {
+        case 'P':
+            $message.innerHTML = "Player Wins 🤑";
+            break;
+        case 'D':
+            $message.innerHTML = "Dealer Wins 😈";
+            break;
+        case 'B':  // blackjack
+            $message.innerHTML = (score(dealerHand) === 21 ? 'Dealer' : 'Player') + ' has Blackjack!';
+            break;
+        case 'T':
+            $message.innerHTML = "It's a Push 👻";
+            break;
+        default:
+            if (!winner && dealerHand) {
+                $message.innerHTML = "Stand or Hit 🤷🏻‍♀";
+            } else {
+                $message.innerHTML = "Place your Bet 🤷🏻‍♀";
+            }
+    }
 }
 
 // display cards
-function displayOne() {
-    var pEl = '';
-    var dEl = '';
-    playerHand.forEach(function (card) {
-        pEl += `<div class="card ${card.display}"></div>`
-    })
-    $container2.innerHTML = pEl;
+function renderHands() {
+    if (dealerHand) {
+        var pEl = '';
+        var dEl = '';
+        playerHand.forEach(function (card) {
+            pEl += `<div class="card ${card.display}"></div>`
+        });
+        $container2.innerHTML = pEl;
+        dealerHand.forEach(function (card, idx) {
+            if (idx === 1 && !winner) {
+                dEl += `<div class="card back-blue"></div>`
+            } else {
+                dEl += `<div class="card ${card.display}"></div>`
+            }
+        });
+        $container1.innerHTML = dEl;
+    } else {
+        // no hands dealt yet (just loaded)
+        $container1.innerHTML = placeholderCards;
+        $container2.innerHTML = placeholderCards;
+    }
+}
 
-        dEl += `<div class="card ${dealerHand[0].display}"></div>`
-        dEl += `<div class="card back-blue"></div>`
- 
-    $container1.innerHTML = dEl;
-};
-
-function displayBoth() {
-    var pEl = '';
-    var dEl = '';
-    playerHand.forEach(function (card) {
-        pEl += `<div class="card ${card.display}"></div>`
-    })
-    $container2.innerHTML = pEl;
-
-    dealerHand.forEach(function (card) {
-        dEl += `<div class="card ${card.display}"></div>`
-    })
-    $container1.innerHTML = dEl;
-};
-
-function score(hand) { 
+// get score
+function score(hand) {
+    if (!hand) return '';
     var score = 0;
     var aceCount = 0;
     for (var i = 0; i < hand.length; i++) {
@@ -146,61 +212,37 @@ function score(hand) {
 
 // stand button 
 function stand() {
-    dealersTurn = true;
+    stand = true;
     getDealerCards();
-    dealerScore = score(dealerHand);
+    winner = getWinner();
     render();
-    
-
 }
 
+// called when player hits "stand"
 function getDealerCards() {
     while (score(dealerHand) < 17) {
-        dealerHand.push(deck[cardCount])
-        cardCount += 1;
+        hit(dealerHand);
     }
 }
-
-
 
 //  check for win
-function winner() {
-    var p = playerScore;
-    var d = dealerScore;
-    if (playerScore > 21 && !dealersTurn) {
-        return "Dealer wins!"
-    } 
-    if (playerHand.length === 2 && playerScore === 21) {
-        return "Blackjack!!!"
-    }
-    if (p === d) {
-        return "It's a tie!";
-    } else if (p <= 21 && d <= 21) {
-        if (p > d) {
-            return "You win!";
-        } else {
-            return "Dealer wins!";
-        }
-    } else if (p > 21 && d > 21) {
-        return "It's a tie!";
-    } else if (p > 21 || d > 21) {
-        if (d > 21) {
-            return "You win!";
-        } else {
-            return "Dealer wins!";
-        }
+function getWinner() {
+    var win;
+    var p = score(playerHand);
+    var d = score(dealerHand);
+    if ((playerHand.length === 2 && p === 21) || (dealerHand.length === 2 && d === 21)) {
+        win = 'B';
+        doPayout(win);
+        return win;
+    } else if (stand) {
+        if (p === d) win = 'T';
+        win = p > d ? 'P' : 'D';
+        doPayout(win);
+        return win;
+    } else {
+        return null;
     }
 };
-
-
-// shuffle cards
-function shuffleDeck() {
-    buildDeck();
-    deck = [];
-    while (cards.length) {
-        deck.push(cards.splice(Math.floor(Math.random() * cards.length), 1)[0]);
-    }
-}
 
 init();
 render();
